@@ -1,8 +1,13 @@
+#Based on https://github.com/Vykonn/akaifire.py
+
+#rtmidi is not use rtmidi pakeage
+# please use python-rtmidi
 from rtmidi import (API_LINUX_ALSA, API_MACOSX_CORE, API_RTMIDI_DUMMY,
                     API_UNIX_JACK, API_WINDOWS_MM, MidiIn, MidiOut,
                     get_compiled_api)
 from rtmidi.midiutil import open_midioutput, open_midiinput
 import time
+import fire_lcd
 global message
 message = [0, 0, 0]
 global stop

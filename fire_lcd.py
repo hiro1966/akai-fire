@@ -1,3 +1,5 @@
+#Baseed on https://github.com/jbflow/Fire-Display/blob/master/AkaiFireDisplayMACOS.py
+
 """This script was written by Josh Ball for Kornelius Paede to facilitate in the formatting of SysEx messages to the display
 text on the OLED screen of an Akai Fire MIDI controller. Credit to Paul Curtis from Segger for his research and testing
 and his extensive blog where he documents his process. Both the PlotPixel and GenerateBitmap functions have been
@@ -13,7 +15,6 @@ directed to Josh from Flowstate. CC BY 4.0"""
 
 import os, re, subprocess, socket
 from PIL import Image, ImageDraw, ImageFont, ImageOps
-import akai_fire_library
 
 #######################################################################################################################
 # Global Variables
@@ -29,9 +30,9 @@ s.close()
 
 # Get a path to puredata
 
-print("a")
+
 for app in os.listdir('/Applications'):
-    if 'Pd-0.52' in app:
+    if 'Pd-0.50' in app:
         pd = app
         break
 
@@ -88,13 +89,7 @@ def make_bits_from_text(text, line, align, fontsize, typeface, negative):
     """ This function generates a bitmap. It takes arguments for the text, line, alignement, fontsize, typeface and
     if negative. These are used to generate a 128 x 56 monochrome image using Pillow, which is then converted to bytes
     before finally being converted to a list of integers and returned"""
-    print("make bits")
-    print(text)
-    print(line)
-    print(align)
-    print(fontsize)
-    print(typeface)
-    print(negative)
+
     if int(fontsize) > 14:
         fontsize = 14
 
@@ -116,8 +111,7 @@ def make_bits_from_text(text, line, align, fontsize, typeface, negative):
 
 
 
-    w = d.textlength(text, font=fnt)
-    h = fontsize
+    w, h = d.textsize(text, font=fnt)
     X_ALIGN = {'left': 2,
                'centre': (W - w) / 2,
                'right': (W - w) - 2}
@@ -132,15 +126,8 @@ def make_bits_from_text(text, line, align, fontsize, typeface, negative):
     d.text(xy=(x, y), text=text, font=fnt, fill=text_color)
     flipped = ImageOps.flip(IMG)
     IMG.save('test.bmp', 'bmp') # This saves a test image to show how the display should look
-    print("AA")
     byte_map = list(flipped.tobytes())
-    print("BB")
-    try:
-        to_ints = [ord(chr(byte)) for byte in byte_map]
-    except Exception as e:
-        print(e)
-    print("CC")
-    print(to_ints)
+    to_ints = [ord(byte) for byte in byte_map]
     return to_ints
 
 
@@ -162,27 +149,21 @@ def PlotPixel(x, y, c):
 def GenerateBitMap(arguments):
     """This function makes a new bitmap using nested loops for x and y of available bit positions, then re-plots them
     using the PlotPixel function above"""
-    print("bitmap")
-    print(arguments)
+
     if len(arguments) == 1 and arguments[0] == 'clear':
         try:
 
             bits = clear_screen()
-            print("bits")
-            print(bits)
         except TypeError:
-            print("TypeError1")
             print(arguments)
             return
     else:
         try:
             bits = make_bits_from_text(*arguments)
         except TypeError:
-            print("TypeError2")
             print(arguments)
             return
-    print("bits1")
-    print(bits)
+
     for x in range(128):
         for y in range(64):
             PlotPixel(x, y, 0)
@@ -197,11 +178,7 @@ def create_sysex_message(arguments):
     """This function creates the sysex message using the functions above, it combines the generated bitmap with the
     appropriate prefix and other messages, then converts this to the appropriate format and sends it to the function
     that communicates with puredata"""
-    print("a")
-    print(arguments)
     new_bit_map = GenerateBitMap(arguments)
-    print("b")
-    print(new_bit_map)
     sysex_prefix = [240, 71, 127, 67, 14]
     start_message = [len(new_bit_map) >> 7]
     end_message = [len(new_bit_map) & 0x7F]
@@ -211,22 +188,7 @@ def create_sysex_message(arguments):
     print (MESSAGE)
     strings = (str(byte) for byte in MESSAGE)
     message_to_send = ' '.join(strings) + ';'
-    #send_to_pd(message_to_send)
-    print("sendmessage")
-    akai_fire_library.sendMessage(message_to_send)
-
-def myFunc():
-    print ("START")
-    sysex_prefix = [240, 71, 127, 67, 14]
-    sysex_end = [247]
-    new_bit_map = GenerateBitMap(["ABCD","1","left","14","arial","false"])
-    start_message = [len(new_bit_map) >> 7]
-    end_message = [len(new_bit_map) & 0x7F]
-    MESSAGE = sysex_prefix + start_message + end_message + new_bit_map + sysex_end
-    print(MESSAGE)
-    #TODO:MIDI出力
-
-    print ("END")
+    send_to_pd(message_to_send)
 
 
 def receive_from_pd():
@@ -240,14 +202,10 @@ def receive_from_pd():
     while True:
         try:
             next_line = process.stdout.readline()
-            print(next_line)
             if next_line:
-                print("c")
                 print(next_line)
-                incoming_data = re.findall('"([^"]*)"', str(next_line))
-                print(incoming_data)
-                if incoming_data != []: create_sysex_message(tuple(incoming_data))
-                print("d")
+                incoming_data = re.findall('"([^"]*)"', next_line)
+                create_sysex_message(tuple(incoming_data))
                 print(tuple(incoming_data))
 
         except KeyboardInterrupt:
@@ -275,5 +233,5 @@ process = subprocess.Popen([path + 'pdreceive', str(port)],
 
 # Then open the other connections and start receiving data, line by line.
 
-#receive_from_pd()
-myFunc()
+receive_from_pd()
+
