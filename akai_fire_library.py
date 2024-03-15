@@ -239,3 +239,6 @@ def sendMessage(message):
     print("SendMessage")
     print(message)
     midiout.send_message(message)
+
+def showLCD(arguments):
+    sendMessage(fire_lcd.create_sysex_message(arguments))

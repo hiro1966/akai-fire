@@ -150,11 +150,12 @@ def myFunc():
     print ("START")
     sysex_prefix = [240, 71, 127, 67, 14]
     sysex_end = [247]
-    new_bit_map = GenerateBitMap(["ABCDEFGHIJKLMNOPQRSTUVWXYZ","2","left","40","arial","false"])
+    new_bit_map = GenerateBitMap(["ABCDEFG","2","left","14","arial","false"])
     start_message = [len(new_bit_map) >> 7]
     end_message = [len(new_bit_map) & 0x7F]
     new_bit_map[:-1171] = [0, 7, 0, 127]
     MESSAGE = sysex_prefix + start_message + end_message + new_bit_map + sysex_end
+    akai_fire_library.showLCD(["HIJKLMN","3","left","14","arial","false"])
     akai_fire_library.sendMessage(MESSAGE)
     
 akai_fire_library.clear()
