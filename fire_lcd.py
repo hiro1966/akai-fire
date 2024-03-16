@@ -67,9 +67,15 @@ def make_bits_from_text(text, line, align, fontsize, typeface, negative):
     """ This function generates a bitmap. It takes arguments for the text, line, alignement, fontsize, typeface and
     if negative. These are used to generate a 128 x 56 monochrome image using Pillow, which is then converted to bytes
     before finally being converted to a list of integers and returned"""
-
-    if int(fontsize) > 14:
-        fontsize = 14
+    print("make bits")
+    print(text)
+    print(line)
+    print(align)
+    print(fontsize)
+    print(typeface)
+    print(negative)
+    if int(fontsize) > 50:
+        fontsize = 50
 
     if negative == 'true':
         text_color = 0
@@ -89,10 +95,8 @@ def make_bits_from_text(text, line, align, fontsize, typeface, negative):
 
 
 
-    #change for python3
     w = d.textlength(text, font=fnt)
     h = fontsize
-    
     X_ALIGN = {'left': 2,
                'centre': (W - w) / 2,
                'right': (W - w) - 2}
@@ -108,8 +112,12 @@ def make_bits_from_text(text, line, align, fontsize, typeface, negative):
     flipped = ImageOps.flip(IMG)
     IMG.save('test.bmp', 'bmp') # This saves a test image to show how the display should look
     byte_map = list(flipped.tobytes())
-    to_ints = [ord(byte) for byte in byte_map]
+    try:
+        to_ints = [ord(chr(byte)) for byte in byte_map]
+    except Exception as e:
+        print(e)
     return to_ints
+
 
 
 def PlotPixel(x, y, c):
@@ -130,21 +138,27 @@ def PlotPixel(x, y, c):
 def GenerateBitMap(arguments):
     """This function makes a new bitmap using nested loops for x and y of available bit positions, then re-plots them
     using the PlotPixel function above"""
-
+    print("bitmap")
+    print(arguments)
     if len(arguments) == 1 and arguments[0] == 'clear':
         try:
 
             bits = clear_screen()
+            print("bits")
+            print(bits)
         except TypeError:
+            print("TypeError1")
             print(arguments)
             return
     else:
         try:
             bits = make_bits_from_text(*arguments)
         except TypeError:
+            print("TypeError2")
             print(arguments)
             return
-
+    print("bits1")
+    print(bits)
     for x in range(128):
         for y in range(64):
             PlotPixel(x, y, 0)
@@ -153,6 +167,7 @@ def GenerateBitMap(arguments):
             if bits[(55 - y) * int(128 // 8) + int(x // 8)] & (0x80 >> (x % 8)):
                 PlotPixel(x + 4, y + 4, 1)
     return BitMap
+
 
 
 def create_sysex_message(arguments):
