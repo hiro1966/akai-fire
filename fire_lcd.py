@@ -13,7 +13,7 @@ directed to Josh from Flowstate. CC BY 4.0"""
 
 #Requires Python Pillow package for generating Bitmaps
 
-import os, re, subprocess, socket
+#import os, re, subprocess, socket
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 
@@ -98,7 +98,7 @@ def make_bits_from_text(text, line, align, fontsize, typeface, negative):
     w = d.textlength(text, font=fnt)
     h = fontsize
     X_ALIGN = {'left': 2,
-               'centre': (W - w) / 2,
+               'center': (W - w) / 2,
                'right': (W - w) - 2}
     try:
         x = X_ALIGN[align]
