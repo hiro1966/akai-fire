@@ -15,7 +15,7 @@ directed to Josh from Flowstate. CC BY 4.0"""
 
 #import os, re, subprocess, socket
 from PIL import Image, ImageDraw, ImageFont, ImageOps
-
+import platform
 
 # Create the blank image and drawing
 W, H = (128, 56)
@@ -29,11 +29,20 @@ Y_ALIGN = {1: 0,
            4: 42}
 
 # Create a dictionary that will be used to select the typeface, this can be expanded if need.
-
-FontDict = {'arial': 'Pillow/Tests/fonts/Arial.ttf',
-            'verdana': 'Pillow/Tests/fonts/Verdana.ttf',
-            'times': 'Pillow/Tests/fonts/Times New Roman.ttf'}
-
+pf = platform.system()
+if pf == 'Windows':
+    FontDict = {'arial': 'c:/Windows/fonts/Arial.ttf',
+                'verdana': 'c:/Windows/fonts/Verdana.ttf',
+                'times': 'c:/Windows/fonts/tahoma.ttf'}
+elif pf == 'Darwin':
+    FontDict = {'arial': '/Library/Fonts/Arial.ttf',
+                'verdana': '/Library/Fonts/Verdana.ttf',
+                'times': '/Library/Fonts/Times New Roman.ttf'}
+else:
+    FontDict = {'arial': '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',
+                'verdana': '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',
+                'times': '/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf'}
+        
 # Pixel re-mapping order
 
 BitMutate = [[13, 19, 25, 31, 37, 43, 49],

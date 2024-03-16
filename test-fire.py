@@ -42,7 +42,7 @@ while True:
         showLCD("center to side")
         for col in range(8):
             for row in range(4):
-                akai_fire_library.drawpad(8 - col + row * 16,[red,green,blue])
+                akai_fire_library.drawpad(7 - col + row * 16,[red,green,blue])
                 akai_fire_library.drawpad(8 + col + row * 16,[red,green,blue])
             time.sleep(0.1)    
     elif direction == 3:
