@@ -40,7 +40,15 @@ class MidiInputHandler(object):
             message[1] = (messagee[1]-54)
             message[2] = "pad"
         else:
-            if messagee[1] not in range(16,20):
+            if messagee[1] == 118: #SELECT
+                if messagee[2] == 127: message[0] = "left"
+                if messagee[2] == 1: message[0] = "right"
+                message[2] = "SEELCT"
+            elif messagee[1] == 25: #SELECT
+                if messagee[2] == 127: message[0] = "on"
+                if messagee[2] == 0: message[0] = "off"
+                message[2] = "SEELCT"
+            elif messagee[1] not in range(16,20): #buttons
                 if messagee[0] == 144: message[0] = "on"
                 if messagee[0] == 128: message[0] = "off"
                 message[2] = "extra"
@@ -54,7 +62,7 @@ class MidiInputHandler(object):
                 if messagee[1] == 36: message[1] = 14
                 if messagee[1] == 26: message[1] = 29
                 if messagee[1] in range(31,36): message[1] = messagee[1] - 7
-            else:
+            else:   #knobs
                 if messagee[0] == 144: message[0] = "on"
                 if messagee[0] == 128: message[0] = "off"
                 if messagee[0] == 176:
@@ -103,7 +111,6 @@ for api, api_name in sorted(apis.items()):
 if not inmain is None:
     midiin, port_name = open_midiinput(inmain)
     midiin.set_callback(MidiInputHandler(port_name))   
-print(outmain)
 if not outmain is None:
     midiout, port_name = open_midioutput(outmain)
 def sethz(hz):

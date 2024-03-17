@@ -70,8 +70,6 @@ def clear_screen():
     to_ints = [ord(byte) for byte in byte_map]
     return to_ints
 
-
-
 def make_bits_from_text(text, line, align, fontsize, typeface, negative):
     """ This function generates a bitmap. It takes arguments for the text, line, alignement, fontsize, typeface and
     if negative. These are used to generate a 128 x 56 monochrome image using Pillow, which is then converted to bytes
